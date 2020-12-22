@@ -1,15 +1,18 @@
 import { NgModule } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
-import { HttpClientModule } from '@angular/common/http'
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'
 import { StoreModule } from '@ngrx/store'
 import { StoreDevtoolsModule } from '@ngrx/store-devtools'
 import { EffectsModule } from '@ngrx/effects'
 
 import { environment } from 'src/environments/environment'
 
-import { AppRoutingModule } from 'src/app/app-routing.module'
-import { AppComponent } from 'src/app/app.component'
-import { AuthModule } from 'src/app/auth/auth.module'
+import { AppRoutingModule } from '@/app-routing.module'
+import { AppComponent } from '@/app.component'
+import { AuthModule } from '@/auth/auth.module'
+import { TopBarModule } from '@/shared/modules/top-bar/top-bar.module'
+import { PersistanceService } from '@/shared/services/persistance.service'
+import { AUthInterceptor } from '@/shared/services/auth-interceptor.service'
 
 @NgModule({
   declarations: [AppComponent],
@@ -24,8 +27,16 @@ import { AuthModule } from 'src/app/auth/auth.module'
       maxAge: 25, // Retains last 25 states
       logOnly: environment.production, // Restrict extension to log-only mode
     }),
+    TopBarModule,
   ],
-  providers: [],
+  providers: [
+    PersistanceService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AUthInterceptor,
+      multi: true,
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
